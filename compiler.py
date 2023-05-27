@@ -1,6 +1,4 @@
-import re
-
-
+# Token types
 INTEGER = 'INTEGER'
 PLUS = 'PLUS'
 MINUS = 'MINUS'
@@ -8,6 +6,7 @@ MULTIPLY = 'MULTIPLY'
 DIVIDE = 'DIVIDE'
 EOF = 'EOF'
 
+# Token class
 class Token:
     def __init__(self, type, value):
         self.type = type
@@ -127,3 +126,19 @@ class Parser:
 # Compiler
 def main():
     while True:
+        try:
+            text = input('> ')
+        except EOFError:
+            break
+
+        if not text:
+            continue
+
+        lexer = Lexer(text)
+        parser = Parser(lexer)
+        result = parser.expr()
+        print(result)
+
+# Run the compiler
+if __name__ == '__main__':
+    main()
