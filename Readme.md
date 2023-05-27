@@ -45,3 +45,17 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 
 
 You can copy the above Markdown code and save it in a file named `README.md` in your project's root directory. Feel free to modify the content as per your requirements.
+
+
+
+
+
+
+
+NOT USING 
+
+LL(1)
+LR(0)
+SLR(1)
+CLR
+LALR
