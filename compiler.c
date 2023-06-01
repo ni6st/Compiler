@@ -146,6 +146,5 @@ int main() {
 
     getNextToken(&lexer);
     parseExpression(&lexer);
-
     return 0;
 }
