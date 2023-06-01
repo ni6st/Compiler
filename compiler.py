@@ -1,4 +1,4 @@
-# Token types
+
 INTEGER = 'INTEGER'
 PLUS = 'PLUS'
 MINUS = 'MINUS'
@@ -6,7 +6,7 @@ MULTIPLY = 'MULTIPLY'
 DIVIDE = 'DIVIDE'
 EOF = 'EOF'
 
-# Token class
+
 class Token:
     def __init__(self, type, value):
         self.type = type
