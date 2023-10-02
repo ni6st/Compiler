@@ -2,149 +2,89 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+// Define token types
 typedef enum {
-    TOKEN_INTEGER,
-    TOKEN_PLUS,
-    TOKEN_MINUS,
-    TOKEN_MULTIPLY,
-    TOKEN_DIVIDE,
-    TOKEN_LPAREN,
-    TOKEN_RPAREN,
-    TOKEN_END
+    NUMBER,
+    PLUS,
+    MINUS,
+    MULTIPLY,
+    DIVIDE,
+    LPAREN,
+    RPAREN,
+    END_OF_INPUT
 } TokenType;
 
+// Define a token structure
 typedef struct {
     TokenType type;
     int value;
 } Token;
 
-typedef struct {
-    const char* input;
-    Token currentToken;
-    int currentIndex;
-} Lexer;
+char *input = "3 + 4 * (5 - 2)";
 
-void initLexer(Lexer* lexer, const char* input) {
-    lexer->input = input;
-    lexer->currentIndex = 0;
-    lexer->currentToken.type = TOKEN_END;
-    lexer->currentToken.value = 0;
+// Function to get the next token from the input
+Token getNextToken() {
+    // Implement a lexer to tokenize the input string.
+    // You can use a finite-state machine or regular expressions here.
+    // For simplicity, this example skips whitespace.
+
+    // ... Implement your lexer here ...
+
+    // Return the next token.
 }
 
-void getNextToken(Lexer* lexer) {
-    const char* input = lexer->input;
-    int currentIndex = lexer->currentIndex;
-    char currentChar = input[currentIndex];
-
-    if (currentChar == '\0') {
-        lexer->currentToken.type = TOKEN_END;
-        lexer->currentToken.value = 0;
-        return;
-    }
-
-    if (isdigit(currentChar)) {
-        int value = 0;
-        while (isdigit(currentChar)) {
-            value = value * 10 + (currentChar - '0');
-            currentChar = input[++currentIndex];
-        }
-        lexer->currentToken.type = TOKEN_INTEGER;
-        lexer->currentToken.value = value;
-    } else {
-        switch (currentChar) {
-            case '+':
-                lexer->currentToken.type = TOKEN_PLUS;
-                break;
-            case '-':
-                lexer->currentToken.type = TOKEN_MINUS;
-                break;
-            case '*':
-                lexer->currentToken.type = TOKEN_MULTIPLY;
-                break;
-            case '/':
-                lexer->currentToken.type = TOKEN_DIVIDE;
-                break;
-            case '(':
-                lexer->currentToken.type = TOKEN_LPAREN;
-                break;
-            case ')':
-                lexer->currentToken.type = TOKEN_RPAREN;
-                break;
-            default:
-                printf("Invalid character: %c\n", currentChar);
-                exit(1);
-        }
-        lexer->currentToken.value = 0;
-        currentIndex++;
-    }
-
-    lexer->currentIndex = currentIndex;
-}
-
-void parseExpression(Lexer* lexer);
-
-void parseFactor(Lexer* lexer) {
-    Token token = lexer->currentToken;
-    if (token.type == TOKEN_INTEGER) {
-        printf("    push %d\n", token.value);
-        getNextToken(lexer);
-    } else if (token.type == TOKEN_LPAREN) {
-        getNextToken(lexer);
-        parseExpression(lexer);
-        if (lexer->currentToken.type != TOKEN_RPAREN) {
-            printf("Expected ')'\n");
+// Function to parse a factor
+int parseFactor() {
+    Token token = getNextToken();
+    if (token.type == NUMBER) {
+        return token.value;
+    } else if (token.type == LPAREN) {
+        int result = parseExpression();
+        if (getNextToken().type != RPAREN) {
+            printf("Error: Mismatched parentheses.\n");
             exit(1);
         }
-        getNextToken(lexer);
+        return result;
     } else {
-        printf("Unexpected token: %d\n", token.type);
+        printf("Error: Invalid factor.\n");
         exit(1);
     }
 }
 
-void parseTerm(Lexer* lexer) {
-    parseFactor(lexer);
-    Token token = lexer->currentToken;
-
-    while (token.type == TOKEN_MULTIPLY || token.type == TOKEN_DIVIDE) {
-        getNextToken(lexer);
-        parseFactor(lexer);
-
-        if (token.type == TOKEN_MULTIPLY) {
-            printf("    multiply\n");
+// Function to parse a term
+int parseTerm() {
+    int left = parseFactor();
+    Token token = getNextToken();
+    while (token.type == MULTIPLY || token.type == DIVIDE) {
+        int right = parseFactor();
+        if (token.type == MULTIPLY) {
+            left *= right;
         } else {
-            printf("    divide\n");
+            left /= right;
         }
-
-        token = lexer->currentToken;
+        token = getNextToken();
     }
+    return left;
 }
 
-void parseExpression(Lexer* lexer) {
-    parseTerm(lexer);
-    Token token = lexer->currentToken;
-
-    while (token.type == TOKEN_PLUS || token.type == TOKEN_MINUS) {
-        getNextToken(lexer);
-        parseTerm(lexer);
-
-        if (token.type == TOKEN_PLUS) {
-            printf("    add\n");
+// Function to parse an expression
+int parseExpression() {
+    int left = parseTerm();
+    Token token = getNextToken();
+    while (token.type == PLUS || token.type == MINUS) {
+        int right = parseTerm();
+        if (token.type == PLUS) {
+            left += right;
         } else {
-            printf("    subtract\n");
+            left -= right;
         }
-
-        token = lexer->currentToken;
+        token = getNextToken();
     }
+    return left;
 }
 
 int main() {
-    const char* input = "2 * (3 + 4)";
-
-    Lexer lexer;
-    initLexer(&lexer, input);
-
-    getNextToken(&lexer);
-    parseExpression(&lexer);
+    int result = parseExpression();
+    printf("Result: %d\n", result);
     return 0;
 }
